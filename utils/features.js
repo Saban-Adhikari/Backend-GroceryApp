@@ -1,6 +1,7 @@
 import DataUriParser from "datauri/parser.js";
 import path from "path";
-import { createTransport } from "nodemailer";
+//import { createTransport } from "nodemailer";
+const mailgun = require("mailgun-js");
 
 export const getDataUri = (file) => {
   const parser = new DataUriParser();
@@ -30,19 +31,16 @@ export const cookieOptions = {
 };
 
 export const sendEmail = async (subject, to, text) => {
-  const transporter = createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  const DOMAIN = process.env.MAILGUN_DOMAIN;
+  const API_KEY = process.env.MAILGUN_API_KEY;
+  const mg = mailgun({ apiKey: API_KEY, domain: DOMAIN });
 
-  await transporter.sendMail({
+  const data = {
+    from,
     to,
     subject,
     text,
-  });
+  };
+
+  await mg.messages().send(data);
 };
