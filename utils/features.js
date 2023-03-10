@@ -36,7 +36,7 @@ export const sendEmail = async (subject, to, text) => {
   const mg = mailgun({ apiKey: API_KEY, domain: DOMAIN });
 
   const data = {
-    from,
+    from: "sabanadhikari@gmail.com",
     to,
     subject,
     text,
