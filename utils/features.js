@@ -1,7 +1,7 @@
 import DataUriParser from "datauri/parser.js";
 import path from "path";
 //import { createTransport } from "nodemailer";
-const mailgun = require("mailgun-js");
+import mailgun from "mailgun-js";
 
 export const getDataUri = (file) => {
   const parser = new DataUriParser();
