@@ -1,5 +1,6 @@
-import express from "express";
+import express from "express"; // Import express
 import {
+  // Import the following functions from controllers/product.js
   addNewCategory,
   addProductImage,
   deleteCategory,
@@ -15,11 +16,14 @@ import {
 import { isAuthenticated, verifyAdmin } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 
+// Create a router
 const router = express.Router();
 
+// Create routes
 router.get("/all", getAllProducts);
 router.get("/admin", isAuthenticated, verifyAdmin, getAdminProducts);
 
+// Create routes for products
 router
   .route("/single/:id")
   .get(getProductDetail)
@@ -33,6 +37,7 @@ router
   .post(isAuthenticated, verifyAdmin, singleUpload, addProductImage)
   .delete(isAuthenticated, verifyAdmin, deleteProductImage);
 
+// Create routes for categories
 router.post("/category", isAuthenticated, verifyAdmin, addNewCategory);
 router.get("/categories", getCategory);
 router.delete("/category/:id", isAuthenticated, verifyAdmin, deleteCategory);

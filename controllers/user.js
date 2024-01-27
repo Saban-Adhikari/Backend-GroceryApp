@@ -9,15 +9,20 @@ import {
 } from "../utils/features.js";
 import cloudinary from "cloudinary";
 
+// for login
 export const login = asyncError(async (req, res, next) => {
+  //Getting email and password from request body
   const { email, password } = req.body;
 
+  //Checking if user exists
   const user = await User.findOne({ email }).select("+password");
 
+  //Handling error
   if (!user) {
     return next(new ErrorHandler("Incorrect email or password", 400));
   }
 
+  //Handling error
   if (!password)
     return next(new ErrorHandler("Please enter the password!", 400));
 
@@ -31,15 +36,19 @@ export const login = asyncError(async (req, res, next) => {
   sendToken(user, res, `Wohoo, hi, ${user.fullName}`, 200);
 });
 
+// for signup
 export const signup = asyncError(async (req, res, next) => {
   const { fullName, email, password, phoneNumber } = req.body;
 
+  //Checking if user already exists
   let user = await User.findOne({ email });
 
+  //Handling error
   if (user) return next(new ErrorHandler("User already exists!", 400));
 
   let character = undefined;
 
+  //Uploading image to cloudinary
   if (req.file) {
     const file = getDataUri(req.file);
 
@@ -51,6 +60,7 @@ export const signup = asyncError(async (req, res, next) => {
     };
   }
 
+  //Creating new user
   user = await User.create({
     fullName,
     email,
@@ -58,9 +68,11 @@ export const signup = asyncError(async (req, res, next) => {
     phoneNumber,
     character,
   });
+  //Sending token
   sendToken(user, res, `Registered successfully!`, 201);
 });
 
+// for logout
 export const logOut = asyncError(async (req, res, next) => {
   res
     .status(200)
@@ -74,6 +86,7 @@ export const logOut = asyncError(async (req, res, next) => {
     });
 });
 
+//for get my profile
 export const getMyProfile = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
@@ -83,6 +96,7 @@ export const getMyProfile = asyncError(async (req, res, next) => {
   });
 });
 
+//for profile update
 export const profileUpdate = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
@@ -100,6 +114,7 @@ export const profileUpdate = asyncError(async (req, res, next) => {
   });
 });
 
+//for password update
 export const passwordUpdate = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id).select("+ password");
 
@@ -127,6 +142,7 @@ export const passwordUpdate = asyncError(async (req, res, next) => {
   });
 });
 
+//for update picture
 export const updatePicture = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
@@ -148,20 +164,21 @@ export const updatePicture = asyncError(async (req, res, next) => {
   });
 });
 
+//for forgot password
 export const forgotPassword = asyncError(async (req, res, next) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+  const { email } = req.body; //getting email from request body
+  const user = await User.findOne({ email }); //finding user with that email
 
   if (!user)
     return next(
       new ErrorHandler("User with that e-mail does not exist!!!", 404)
     );
 
-  const randomNum = Math.random() * (999999 - 100000) + 100000;
+  const randomNum = Math.random() * (999999 - 100000) + 100000; //generating random 6 digit number
 
-  const otp = Math.floor(randomNum);
+  const otp = Math.floor(randomNum); //converting to integer
 
-  const otp_expire = 15 * 60 * 1000;
+  const otp_expire = 15 * 60 * 1000; //15 minutes expiry time for otp
 
   user.otp = otp;
   user.otp_expire = new Date(Date.now() + otp_expire);
@@ -184,6 +201,7 @@ export const forgotPassword = asyncError(async (req, res, next) => {
   });
 });
 
+//for reset password
 export const resetPassword = asyncError(async (req, res, next) => {
   const { otp, password } = req.body;
 

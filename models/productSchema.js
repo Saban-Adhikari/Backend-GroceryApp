@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"; // Importing mongoose
 
+// Creating product schema where it has following fields
 const schema = new mongoose.Schema({
   productName: {
     type: String,
@@ -29,4 +30,5 @@ const schema = new mongoose.Schema({
   ],
 });
 
+// Exporting the model
 export const Product = mongoose.model("Product", schema);

@@ -5,6 +5,7 @@ import { Order } from "../models/orderSchema.js";
 import { Product } from "../models/productSchema.js";
 import ErrorHandler from "../utils/error.js";
 
+//for new order
 export const createNewOrder = asyncError(async (req, res, next) => {
   const {
     deliveryInformation,
@@ -16,6 +17,7 @@ export const createNewOrder = asyncError(async (req, res, next) => {
     subTotal,
   } = req.body;
 
+  //creating a new order
   await Order.create({
     user: req.user._id,
     deliveryInformation,
@@ -27,9 +29,10 @@ export const createNewOrder = asyncError(async (req, res, next) => {
     subTotal,
   });
   for (let index = 0; index < orderInfo.length; index++) {
-    const product = await Product.findById(orderInfo[index].productDetail);
-    product.availableStock -= orderInfo[index].orderQuantity;
-    await product.save();
+    //loop through the orderInfo
+    const product = await Product.findById(orderInfo[index].productDetail); //find the product
+    product.availableStock -= orderInfo[index].orderQuantity; //decrease the stock
+    await product.save(); //save the product
   }
 
   res.status(201).json({

@@ -49,6 +49,7 @@ export const getProductDetail = asyncError(async (req, res, next) => {
   });
 });
 
+//for new product
 export const newProduct = asyncError(async (req, res, next) => {
   const {
     productName,
@@ -59,17 +60,20 @@ export const newProduct = asyncError(async (req, res, next) => {
   } = req.body;
 
   if (!req.file)
+    //Handling error
     return next(new ErrorHandler("Adding image is required!", 400));
 
   const file = getDataUri(req.file);
 
-  const result = await cloudinary.v2.uploader.upload(file.content);
+  const result = await cloudinary.v2.uploader.upload(file.content); //Uploading image to cloudinary
 
+  //Storing image details
   const image = {
     public_id: result.public_id,
     url: result.secure_url,
   };
 
+  //creating new product
   await Product.create({
     productName,
     productDescription,
@@ -85,6 +89,7 @@ export const newProduct = asyncError(async (req, res, next) => {
   });
 });
 
+//for update products
 export const updateProducts = asyncError(async (req, res, next) => {
   const {
     productName,
@@ -94,13 +99,14 @@ export const updateProducts = asyncError(async (req, res, next) => {
     category,
   } = req.body;
 
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id); //finding product
 
   if (!product)
     return next(
-      new ErrorHandler("The product you were searching was not found!", 404)
+      new ErrorHandler("The product you were searching was not found!", 404) //Handling error
     );
 
+  //Updating product details
   if (productName) product.productName = productName;
   if (productDescription) product.productDescription = productDescription;
   if (productPrice) product.productPrice = productPrice;

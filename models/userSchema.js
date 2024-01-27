@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
-import validator from "validator";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import mongoose from "mongoose"; // Importing mongoose
+import validator from "validator"; // Importing validator
+import bcrypt from "bcrypt"; // Importing bcrypt
+import jwt from "jsonwebtoken"; // Importing jsonwebtoken
 
+// Creating user schema where it has following fields
 const schema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -38,18 +39,22 @@ const schema = new mongoose.Schema({
   otp_expire: Date,
 });
 
+// Encrypting password before saving it to database
 schema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  // this is the document
+  if (!this.isModified("password")) return next(); // if password is not modified, then return next
+  this.password = await bcrypt.hash(this.password, 10); // if password is modified, then hash it
 });
 
+// Comparing password
 schema.methods.comparePassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password); // this.password is the hashed password
 };
 
+// Generating token
 schema.methods.generateToken = function () {
   return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: "10d",
+    expiresIn: "10d", // token expires in 10 days
   });
 };
 
